@@ -147,13 +147,13 @@ export default function Page() {
     <main style={{ maxWidth: 820, margin: "40px auto", padding: "0 16px", lineHeight: 1.45 }}>
       <h1 style={{ fontSize: 40, fontWeight: 700, marginBottom: 19 }}>OpenAI Builder Onramp</h1>
       <p style={{ marginBottom: 18 }}>
-        Pick your goal. We’ll suggest a stack and give you a tiny, copy-pastable first step.
+        Experimental onboarding prototype designed to reduce friction between idea and first API call
       </p>
 
       {/* Goal */}
       <div style={{ fontSize: 18, display: "grid", gap: 12, marginBottom: 16 }}>
         <label>
-          <div style={{ fontsize: 18, fontWeight: 600, marginBottom: 6 }}>What do you want to build?</div>
+          <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 6 }}>What do you want to build?</div>
           <select value={want} onChange={(e) => onChangeWant(e.target.value)} style={{ width: "100%", padding: 8 }}>
             {WANTS.map(w => (
               <option key={w.value} value={w.value}>{w.label}</option>
