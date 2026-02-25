@@ -6,19 +6,13 @@ export async function POST(req: Request) {
   const started = Date.now();
   try {
     const apiKey = process.env.OPENAI_API_KEY;
-    const projectId = process.env.OPENAI_PROJECT_ID;
-    if (!apiKey) {
+      if (!apiKey) {
       return NextResponse.json(
         { success: false, error: "Missing OPENAI_API_KEY" },
         { status: 500 }
       );
     }
-    if (!projectId) {
-      return NextResponse.json(
-        { success: false, error: "Missing OPENAI_PROJECT_ID" },
-        { status: 500 }
-      );
-    }
+   
 
     // Defaults + user overrides
     const body = await req.json().catch(() => ({}));
