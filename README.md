@@ -1,5 +1,7 @@
 OpenAI Onboarding App MVP
 
+Live Demo: https://open-ai-onboarding-app-mvp.vercel.app/
+
 Overview
 
 Interactive onboarding prototype designed to map builder intent to the most relevant OpenAI tools and starting paths.
