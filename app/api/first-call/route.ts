@@ -29,8 +29,7 @@ export async function POST(req: Request) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
-        "OpenAI-Project": projectId,
-      },
+              },
       body: JSON.stringify({
         model,
         temperature,
