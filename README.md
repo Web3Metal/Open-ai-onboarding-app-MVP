@@ -4,9 +4,9 @@ Live Demo: https://open-ai-onboarding-app-mvp.vercel.app/
 
 Overview
 
-Interactive onboarding prototype designed to map builder intent to the most relevant OpenAI tools and starting paths.
+OpenAI Builder Onramp MVP
+A structured onboarding prototype that maps builder intent to recommended API surfaces and generates a first call snippet to reduce time to first successful interaction.
 
-Built as an experiment to reduce friction between “I have an idea” and “I know where to start.”
 
 Problem
 
