@@ -2,12 +2,10 @@
 
 import { useState } from "react";
 
-/* ---------------------- options & helpers ---------------------- */
-
 type StackOption = {
   value: string;
-  label: string;   // short consumer-facing label
-  bestAt: string;  // beginner-friendly explanation
+  label: string;
+  bestAt: string;
 };
 
 const WANTS = [
@@ -20,12 +18,12 @@ const WANTS = [
 ];
 
 const STACKS: StackOption[] = [
-  { value: "nextjs",        label: "Next.js (Web)",                 bestAt: "Best for polished websites and web apps with pages, navigation, and UI." },
-  { value: "node-express",  label: "Node.js + Express (Server)",    bestAt: "Runs backend logic — perfect for bots, APIs, and background tasks." },
-  { value: "python-fastapi",label: "Python + FastAPI (AI Ready)",   bestAt: "Great for AI projects, chatbots, and anything needing Python libraries." },
-  { value: "python-flask",  label: "Python + Flask (Simple)",       bestAt: "Very lightweight — ideal for tiny prototypes and quick bots." },
-  { value: "deno-fresh",    label: "Deno + Fresh (Modern)",         bestAt: "New, secure, lightweight stack for JavaScript/TypeScript projects." },
-  { value: "bun-elysia",    label: "Bun + Elysia (Experimental)",   bestAt: "Extremely fast JS/TS runtime — great for tinkering and high speed." },
+  { value: "nextjs",         label: "Next.js (Web)",              bestAt: "Best for polished websites and web apps with pages, navigation, and UI." },
+  { value: "node-express",   label: "Node.js + Express (Server)", bestAt: "Runs backend logic — perfect for bots, APIs, and background tasks." },
+  { value: "python-fastapi", label: "Python + FastAPI (AI Ready)",bestAt: "Great for AI projects, chatbots, and anything needing Python libraries." },
+  { value: "python-flask",   label: "Python + Flask (Simple)",    bestAt: "Very lightweight — ideal for tiny prototypes and quick bots." },
+  { value: "deno-fresh",     label: "Deno + Fresh (Modern)",      bestAt: "New, secure, lightweight stack for JavaScript/TypeScript projects." },
+  { value: "bun-elysia",     label: "Bun + Elysia (Experimental)",bestAt: "Extremely fast JS/TS runtime — great for tinkering and high speed." },
 ];
 
 const RECOMMENDED: Record<string, string> = {
@@ -47,34 +45,13 @@ function getWantHelp(v: string) {
   return WANTS.find(w => w.value === v)?.help ?? "";
 }
 
-// Pull first fenced code block from markdown-ish text
-function splitMd(md: string) {
-  const m = md.match(/```[\w-]*\n([\s\S]*?)```/);
-  let code = "";
-  let rest = md;
-  if (m) {
-    code = m[1].trim();
-    rest = md.replace(m[0], "").trim();
-  }
-  return { code, rest };
-}
-
-/* ---------------------- page component ---------------------- */
-
 export default function Page() {
-  // Goal + stack with recommendation that can be overridden
   const [want, setWant] = useState(WANTS[0].value);
   const [stack, setStack] = useState(RECOMMENDED[WANTS[0].value]);
   const [userOverrodeStack, setUserOverrodeStack] = useState(false);
-
-  // Experience level
   const [level, setLevel] = useState("Comfortable");
-
-  // Model + temperature controls
   const [model, setModel] = useState("gpt-4o-mini");
   const [temperature, setTemperature] = useState(0.4);
-
-  // UI state
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string>("");
   const [snippet, setSnippet] = useState<string>("");
@@ -88,6 +65,7 @@ export default function Page() {
       if (rec) setStack(rec);
     }
   }
+
   function onChangeStack(v: string) {
     setUserOverrodeStack(true);
     setStack(v);
@@ -131,10 +109,15 @@ export default function Page() {
         return;
       }
 
-      const full = data.output || "";
-      const { code, rest } = splitMd(full);
-      setSnippet(code);
-      setResult(rest);
+      const o = data.output;
+      const parts = [
+        o?.use_case && `Use case:\n${o.use_case}`,
+        o?.recommended_api_surface && `Recommended API:\n${o.recommended_api_surface}`,
+        o?.next_step && `Next step:\n${o.next_step}`,
+      ].filter(Boolean).join("\n\n");
+
+      setResult(parts);
+      setSnippet(o?.first_call_example ?? "");
       setInfo({ latencyMs: data.latencyMs, success: true });
     } catch (e: any) {
       setError(e?.message ?? "Network error");
@@ -150,7 +133,6 @@ export default function Page() {
         Experimental onboarding prototype designed to reduce friction between idea and first API call
       </p>
 
-      {/* Goal */}
       <div style={{ fontSize: 18, display: "grid", gap: 12, marginBottom: 16 }}>
         <label>
           <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 6 }}>What do you want to build?</div>
@@ -159,12 +141,9 @@ export default function Page() {
               <option key={w.value} value={w.value}>{w.label}</option>
             ))}
           </select>
-          <div style={{ fontSize: 12, color: "#555", marginTop: 6 }}>
-            {getWantHelp(want)}
-          </div>
+          <div style={{ fontSize: 12, color: "#555", marginTop: 6 }}>{getWantHelp(want)}</div>
         </label>
 
-        {/* Stack with auto-recommendation + why */}
         <label>
           <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 6 }}>
             Tech stack {!userOverrodeStack && <span style={{ color: "#0a7", fontSize: 14, marginLeft: 8 }}>Recommended</span>}
@@ -179,12 +158,11 @@ export default function Page() {
           </div>
           {!userOverrodeStack && (
             <div style={{ fontSize: 19, color: "#185bb3ff", marginTop: 4 }}>
-              Preselected based on “{WANTS.find(w => w.value === want)?.label}”. You can switch if you prefer Python or another stack.
+              Preselected based on "{WANTS.find(w => w.value === want)?.label}". You can switch if you prefer Python or another stack.
             </div>
           )}
         </label>
 
-        {/* Experience */}
         <label>
           <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 6 }}>Experience level</div>
           <select value={level} onChange={(e) => setLevel(e.target.value)} style={{ width: "100%", padding: 8 }}>
@@ -195,7 +173,6 @@ export default function Page() {
         </label>
       </div>
 
-      {/* Model */}
       <div style={{ display: "grid", gap: 12, margin: "12px 0 8px" }}>
         <label>
           <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 6 }}>Model</div>
@@ -206,7 +183,6 @@ export default function Page() {
         </label>
       </div>
 
-      {/* Advanced: Temperature */}
       <details style={{ margin: "8px 0 30px" }}>
         <summary style={{ cursor: "pointer", fontWeight: 600 }}>Advanced</summary>
         <div style={{ marginTop: 10 }}>
@@ -247,7 +223,6 @@ export default function Page() {
         {loading ? "Running…" : "Run first call"}
       </button>
 
-      {/* Results */}
       {error && (
         <div style={{ background: "#fde8e8", color: "#8a1111", padding: 12, borderRadius: 8, marginBottom: 12 }}>
           <b>Error</b>
